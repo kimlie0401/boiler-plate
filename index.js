@@ -7,6 +7,7 @@ const config = require("./config/key");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const { User } = require("./models/User");
+const { auth } = require("./middleware/auth");
 
 //application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -28,7 +29,7 @@ mongoose
 
 app.get("/", (req, res) => res.send("Sever start...."));
 
-app.post("/register", (req, res) => {
+app.post("/api/users/register", (req, res) => {
   const user = new User(req.body);
 
   user.save((err, userInfo) => {
@@ -39,7 +40,7 @@ app.post("/register", (req, res) => {
   });
 });
 
-app.post("/login", (req, res) => {
+app.post("/api/users/login", (req, res) => {
   // 요청된 이멜을 데이터베이스에서 있는지 찾는다.
   User.findOne({ email: req.body.email }, (err, user) => {
     if (!user) {
@@ -68,6 +69,20 @@ app.post("/login", (req, res) => {
           .json({ loginSuccess: true, userId: user._id });
       });
     });
+  });
+});
+
+app.post("/api/users/auth", auth, (req, res) => {
+  // 여기까지 미들웨어(auth)를 통과해왔다는 말은 authertication이 true라는 말
+  res.status(200).json({
+    _id: req.user.id,
+    isAdmin: req.user.role === 0 ? false : true,
+    isAuth: true,
+    email: req.user.emil,
+    name: req.user.name,
+    lastName: req.user.lastName,
+    role: req.user.role,
+    image: req.user.image,
   });
 });
 
