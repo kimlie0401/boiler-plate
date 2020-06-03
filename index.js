@@ -2,12 +2,12 @@ const express = require("express");
 const app = express();
 const port = 5000;
 
-const config = require("./config/key");
+const config = require("./server/config/key");
 
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
-const { User } = require("./models/User");
-const { auth } = require("./middleware/auth");
+const { User } = require("./server/models/User");
+const { auth } = require("./server/middleware/auth");
 
 //application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -28,6 +28,10 @@ mongoose
   .catch((err) => console.log(err));
 
 app.get("/", (req, res) => res.send("Sever start...."));
+
+app.get("/api/hello", (req, res) => {
+  res.send("hello");
+});
 
 app.post("/api/users/register", (req, res) => {
   const user = new User(req.body);
